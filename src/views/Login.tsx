@@ -54,7 +54,7 @@ export const LoginView: FunctionComponent = observer(() => {
   }, [count]);
 
   return (
-    <Layout footer={<>This is not an official app from Spotify®.</>}>
+    <Layout footer={<>This is not an official app from Spotify</>}>
       <Content>
         {loading ? (
           <Loading>
@@ -71,7 +71,7 @@ export const LoginView: FunctionComponent = observer(() => {
             </Logo>
             <Button onClick={connect}>
               <SpotifyLogo />
-              <span>Login with Spotify®</span>
+              <span>Login with Spotify</span>
             </Button>
           </Login>
         )}
