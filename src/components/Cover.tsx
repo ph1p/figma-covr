@@ -112,13 +112,22 @@ export const Cover: FunctionComponent<
       onDragEnd={onDragEnd}
       draggable="true"
     >
-      <Image ref={ref} onClick={() => sendImage(imageUrl)}>
-        {!isDrag && (
+      <Image onClick={() => sendImage(imageUrl)}>
+        {!isDrag ? (
           <Overlay>
             <ImageHoverIcon />
           </Overlay>
+        ) : (
+          <Placeholder>
+            <ImageHoverIcon />
+          </Placeholder>
         )}
-        <img src={imageUrl} draggable="false" />
+        <img
+          ref={ref}
+          src={imageUrl}
+          draggable="false"
+          style={{ zIndex: isDrag ? -1 : 1 }}
+        />
       </Image>
 
       <TitleAndArtist>
@@ -133,6 +142,24 @@ export const Cover: FunctionComponent<
   );
 });
 
+const Placeholder = styled.div`
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: transparent;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: opacity 0.3s;
+  svg {
+    align-self: center;
+    margin: 0 auto;
+  }
+`;
+
 const Overlay = styled.div`
   pointer-events: none;
   opacity: 0;
@@ -142,6 +169,7 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   display: flex;
+  z-index: 2;
   background: linear-gradient(
     0deg,
     rgba(27, 196, 125, 0.8),
@@ -194,13 +222,13 @@ const Image = styled.div`
   cursor: pointer;
 
   &:hover {
-    box-shadow: 1px 1px 1px #000;
     ${Overlay} {
       opacity: 1;
     }
   }
 
   img {
+    position: relative;
     width: 100%;
   }
 `;

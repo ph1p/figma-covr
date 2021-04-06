@@ -76,6 +76,7 @@ const ProfilePicture = styled.div`
 
 const Wrapper = styled.div`
   position: fixed;
+  z-index: 10;
   bottom: 17px;
   width: 100%;
   display: flex;
