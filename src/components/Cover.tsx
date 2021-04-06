@@ -113,15 +113,10 @@ export const Cover: FunctionComponent<
       draggable="true"
     >
       <Image onClick={() => sendImage(imageUrl)}>
-        {!isDrag ? (
-          <Overlay>
-            <ImageHoverIcon />
-          </Overlay>
-        ) : (
-          <Placeholder>
-            <ImageHoverIcon />
-          </Placeholder>
-        )}
+        <Overlay className={isDrag ? 'placeholder' : ''}>
+          <ImageHoverIcon />
+        </Overlay>
+
         <img
           ref={ref}
           src={imageUrl}
@@ -142,25 +137,8 @@ export const Cover: FunctionComponent<
   );
 });
 
-const Placeholder = styled.div`
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: transparent;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  transition: opacity 0.3s;
-  svg {
-    align-self: center;
-    margin: 0 auto;
-  }
-`;
-
 const Overlay = styled.div`
+  border-radius: 5px;
   pointer-events: none;
   opacity: 0;
   position: absolute;
@@ -179,6 +157,14 @@ const Overlay = styled.div`
   svg {
     align-self: center;
     margin: 0 auto;
+  }
+  &.placeholder {
+    opacity: 1;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    circle {
+      opacity: 0.2;
+    }
   }
 `;
 
@@ -216,13 +202,11 @@ const TitleAndArtist = styled.div`
 const Image = styled.div`
   position: relative;
   width: 100%;
-  border-radius: 5px;
-  overflow: hidden;
   margin: 0 auto;
   cursor: pointer;
 
   &:hover {
-    ${Overlay} {
+    ${Overlay}:not(.placeholder) {
       opacity: 1;
     }
   }
@@ -230,6 +214,7 @@ const Image = styled.div`
   img {
     position: relative;
     width: 100%;
+    border-radius: 5px;
   }
 `;
 
