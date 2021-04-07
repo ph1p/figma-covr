@@ -111,6 +111,7 @@ const Logo = styled.div`
   text-align: center;
   align-self: center;
   color: #fff;
+  margin-top: 20px;
   img {
     width: 33px;
     height: 33px;

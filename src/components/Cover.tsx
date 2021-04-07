@@ -53,6 +53,8 @@ export const Cover: FunctionComponent<
   };
 
   const onDragEnd = (e) => {
+    e.preventDefault();
+    e.nativeEvent.preventDefault();
     setIsDrag(false);
     if (e.view.length === 0) return;
 
@@ -106,8 +108,6 @@ export const Cover: FunctionComponent<
       key={props.id}
       grid={props.grid}
       data-url={imageUrl}
-      data-name={props.name}
-      data-artists={artists}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       draggable="true"
@@ -225,6 +225,7 @@ const Wrapper = styled.div<{ grid: boolean }>`
   margin: ${(props) => (props.grid ? '0' : '0 0 10px 0')};
   ${Image} {
     width: ${(props) => (props.grid ? '100%' : '70px')};
+    height: ${(props) => (props.grid ? 'auto' : '70px')};
     margin: ${(props) => (props.grid ? '0 auto' : '0 15px 0 0')};
   }
   ${TitleAndArtist} {
