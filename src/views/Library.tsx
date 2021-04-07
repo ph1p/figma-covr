@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { Cover } from '../components/Cover';
 import { Layout } from '../components/Layout';
+import { LoadingIcon } from '../components/icons/LoadingIcon';
 import { useStore } from '../store';
 
 export const LibraryView: FunctionComponent = observer(() => {
@@ -29,10 +30,9 @@ export const LibraryView: FunctionComponent = observer(() => {
           </div>
         ) : (
           <EmptyScreen>
-            <div>
-              <h4>loading...</h4>
-              <p>Retrieving the Album Library</p>
-            </div>
+            <LoadingIcon />
+            <h4>loading...</h4>
+            <p>Retrieving the Album Library</p>
           </EmptyScreen>
         )}
       </Content>
@@ -43,21 +43,21 @@ export const LibraryView: FunctionComponent = observer(() => {
 const EmptyScreen = styled.div`
   width: 100%;
   text-align: center;
-  display: flex;
   justify-content: center;
+  align-self: center;
+  svg {
+    animation: spin 1s linear forwards infinite;
+  }
 
-  div {
-    align-self: center;
-    h4 {
-      margin: 0 0 5px;
-      color: #fff;
-      font-size: 18px;
-    }
-    p {
-      margin: 0;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
-    }
+  h4 {
+    margin: 20px 0 5px;
+    color: #fff;
+    font-size: 18px;
+  }
+  p {
+    margin: 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
   }
 `;
 

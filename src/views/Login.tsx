@@ -92,14 +92,6 @@ const Loading = styled.div`
   align-self: center;
   width: 100%;
   color: #fff;
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
 
   svg {
     animation: spin 1s linear forwards infinite;

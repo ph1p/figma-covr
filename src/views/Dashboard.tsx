@@ -65,7 +65,6 @@ export const DashboardView: FunctionComponent = observer(() => {
 });
 
 const EmptyScreen = styled.div`
-  /* height: 373px; */
   width: 100%;
   text-align: center;
   display: flex;

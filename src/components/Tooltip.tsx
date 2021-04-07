@@ -1,5 +1,5 @@
 import React, {
-  MutableRefObject,
+  RefAttributes,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -9,7 +9,7 @@ import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
 interface Props {
-  handler?: React.ForwardRefExoticComponent<{ ref: MutableRefObject<unknown> }>;
+  handler?: React.ForwardRefExoticComponent<RefAttributes<HTMLElement>>;
   hover?: boolean;
   children: unknown;
   style?: unknown;

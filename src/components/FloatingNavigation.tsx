@@ -78,15 +78,14 @@ const Wrapper = styled.div`
   position: fixed;
   z-index: 10;
   bottom: 17px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   nav {
     padding: 11px 13px;
     border-radius: 28px;
     background-color: #121212;
-    filter: drop-shadow(0px 7px 14px rgba(0,0,0,0.57));
-    /* background-color: #999; */
+    filter: drop-shadow(0px 7px 14px rgba(0, 0, 0, 0.57));
     width: 190px;
     svg {
       path {
