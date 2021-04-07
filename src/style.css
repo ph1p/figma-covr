@@ -41,3 +41,22 @@ body {
   font-size: 12px;
   margin: 0;
 }
+
+::-webkit-scrollbar {
+  width: 14px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 5px solid transparent;
+  background-clip: content-box;
+}

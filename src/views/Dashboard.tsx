@@ -30,7 +30,7 @@ export const DashboardView: FunctionComponent = observer(() => {
 
   return (
     <Layout>
-      <Content>
+      <Content isScrollable={store.searchResults.length > 4}>
         <Header>
           <SearchField>
             <MagnifierIcon />
@@ -65,7 +65,7 @@ export const DashboardView: FunctionComponent = observer(() => {
 });
 
 const EmptyScreen = styled.div`
-  height: 425px;
+  /* height: 373px; */
   width: 100%;
   text-align: center;
   display: flex;
@@ -86,9 +86,11 @@ const EmptyScreen = styled.div`
   }
 `;
 
-const Content = styled.div`
-  padding: 17px;
-  padding-bottom: 90px;
+const Content = styled.div<{isScrollable:boolean}>`
+  padding: 17px ${props => props.isScrollable ? 3 : 17}px 17px 17px;
+  display: grid;
+  min-height: 100%;
+  grid-template-rows: 49px 1fr 60px;
 `;
 
 const SearchResults = styled.div`

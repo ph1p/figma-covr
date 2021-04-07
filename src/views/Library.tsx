@@ -20,11 +20,13 @@ export const LibraryView: FunctionComponent = observer(() => {
 
   return (
     <Layout>
-      <Content>
+      <Content isScrollable={store.libraryAlbums.length > 5}>
         {store.libraryAlbums.length > 0 ? (
-          store.libraryAlbums.map((album) => (
-            <Cover key={album.id} {...album} />
-          ))
+          <div>
+            {store.libraryAlbums.map((album) => (
+              <Cover key={album.id} {...album} />
+            ))}
+          </div>
         ) : (
           <EmptyScreen>
             <div>
@@ -39,13 +41,13 @@ export const LibraryView: FunctionComponent = observer(() => {
 });
 
 const EmptyScreen = styled.div`
-  height: calc(100vh - 34px);
   width: 100%;
   text-align: center;
   display: flex;
   justify-content: center;
 
   div {
+    align-self: center;
     h4 {
       margin: 0 0 5px;
       color: #fff;
@@ -56,11 +58,12 @@ const EmptyScreen = styled.div`
       font-size: 11px;
       color: rgba(255, 255, 255, 0.4);
     }
-    align-self: center;
   }
 `;
 
-const Content = styled.div`
-  padding: 17px;
-  padding-bottom: 90px;
+const Content = styled.div<{ isScrollable: boolean }>`
+  padding: 17px ${(props) => (props.isScrollable ? 3 : 17)}px 17px 17px;
+  display: grid;
+  min-height: 100%;
+  grid-template-rows: 1fr 50px;
 `;

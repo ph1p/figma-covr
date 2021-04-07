@@ -85,6 +85,7 @@ const Wrapper = styled.div`
     padding: 11px 13px;
     border-radius: 28px;
     background-color: #121212;
+    filter: drop-shadow(0px 7px 14px rgba(0,0,0,0.57));
     /* background-color: #999; */
     width: 190px;
     svg {
