@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -14,6 +14,12 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
   const history = useHistory();
   const location = useLocation();
 
+  const profilePictureUrl = useMemo(() => {
+    if (store.user?.images?.length > 0) {
+      return store.user.images[0].url;
+    }
+    return '';
+  }, [store.user]);
   return (
     <Wrapper>
       <nav>
@@ -50,11 +56,7 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
             hover
             handler={React.forwardRef<HTMLLIElement, unknown>((_, ref) => (
               <li ref={ref} className="avatar" onClick={() => store.logout()}>
-                <ProfilePicture
-                  style={{
-                    backgroundImage: `url(${store.user.images[0].url})`,
-                  }}
-                />
+                <ProfilePicture url={profilePictureUrl} />
               </li>
             ))}
           >
@@ -66,12 +68,18 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
   );
 });
 
-const ProfilePicture = styled.div`
+const ProfilePicture = styled.div.attrs((p) => ({
+  className: !p.url ? 'no-picture' : '',
+}))`
   width: 28px;
   height: 28px;
   border-radius: 100%;
   display: block;
   background-size: cover;
+  background-image: url(${(props) => props.url});
+  &.no-picture {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 `;
 
 const Wrapper = styled.div`
