@@ -28,12 +28,6 @@ class RootStore {
   searchTerm = '';
 
   @ignore
-  searchResults: AlbumItem[] = [];
-
-  @ignore
-  libraryAlbums: AlbumItem[] = [];
-
-  @ignore
   get api() {
     return new Api(this, (access_token) => {
       this.setUser({
@@ -53,14 +47,6 @@ class RootStore {
 
   setNotification(notification: Notification) {
     this.notification = notification;
-  }
-
-  setLibraryAlbums(albums: AlbumItem[]) {
-    this.libraryAlbums = albums;
-  }
-
-  setSearchResults(albums: AlbumItem[]) {
-    this.searchResults = albums;
   }
 
   setUser(data) {

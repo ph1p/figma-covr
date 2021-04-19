@@ -1,9 +1,11 @@
 import { observer } from 'mobx-react';
 import React, { FunctionComponent, useEffect } from 'react';
+import { useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import { Cover } from '../components/Cover';
 import { Layout } from '../components/Layout';
+import { LoadingScreen } from '../components/Loading';
 import { MagnifierIcon } from '../components/icons/MagnifierIcon';
 import { useStore } from '../store';
 import { useDebounce } from '../utils/hooks';
@@ -13,24 +15,24 @@ export const DashboardView: FunctionComponent = observer(() => {
 
   const debouncedSearchTerm = useDebounce<string>(store.searchTerm, 500);
 
+  const { isLoading, isError, data = [] } = useQuery(
+    ['users', debouncedSearchTerm],
+    () => (debouncedSearchTerm ? store.api.getAlbums(debouncedSearchTerm) : [])
+  );
+
   useEffect(() => {
-    if (debouncedSearchTerm) {
-      store.api
-        .getAlbums(debouncedSearchTerm)
-        .then((data) => data && store.setSearchResults(data))
-        .catch(() => {
-          store.logout();
-          store.setNotification({
-            title: 'Session timeout',
-            subtitle: 'Please login again',
-          });
-        });
+    if (isError) {
+      store.logout();
+      store.setNotification({
+        title: 'Session timeout',
+        subtitle: 'Please login again',
+      });
     }
-  }, [debouncedSearchTerm]);
+  }, [isError]);
 
   return (
     <Layout>
-      <Content isScrollable={store.searchResults.length > 4}>
+      <Content isScrollable={data.length > 4}>
         <Header>
           <SearchField>
             <MagnifierIcon />
@@ -41,13 +43,15 @@ export const DashboardView: FunctionComponent = observer(() => {
             />
           </SearchField>
         </Header>
+        {isLoading && (
+          <LoadingScreen description="Retrieving album covers" />
+        )}
 
         <SearchResults>
-          {store.searchResults.length > 0 ? (
-            store.searchResults.map((album) => (
-              <Cover grid key={album.id} {...album} />
-            ))
-          ) : (
+          {data.length > 0 &&
+            data.map((album) => <Cover grid key={album.id} {...album} />)}
+
+          {!isLoading && !data.length && (
             <EmptyScreen>
               <div>
                 <h4>Search artists above</h4>
@@ -85,8 +89,8 @@ const EmptyScreen = styled.div`
   }
 `;
 
-const Content = styled.div<{isScrollable:boolean}>`
-  padding: 17px ${props => props.isScrollable ? 3 : 17}px 17px 17px;
+const Content = styled.div<{ isScrollable: boolean }>`
+  padding: 17px ${(props) => (props.isScrollable ? 3 : 17)}px 17px 17px;
   display: grid;
   min-height: 100%;
   grid-template-rows: 49px 1fr 60px;

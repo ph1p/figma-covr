@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import {
   MemoryRouter as Router,
   Redirect,
@@ -21,6 +22,14 @@ import './style.css';
 const AppWrapper = styled.div`
   overflow: hidden;
 `;
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function FilterRoute({ children, authed, redirect, ...props }) {
   return authed ? (
@@ -73,7 +82,9 @@ getStoreFromMain().then((store) =>
   trunk.init(store).then(() => {
     ReactDOM.render(
       <StoreProvider>
-        <App />
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
       </StoreProvider>,
       document.getElementById('app')
     );
