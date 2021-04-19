@@ -13,7 +13,6 @@ module.exports = (env, argv) => ({
     minimizer: [
       new TerserPlugin({
         terserOptions: {
-          ecma: 2016,
           compress: {
             arguments: true,
             drop_console: true,
@@ -36,7 +35,8 @@ module.exports = (env, argv) => ({
         loader: 'esbuild-loader',
         options: {
           loader: 'tsx',
-          target: 'es2015',
+          target: 'es2016',
+          tsconfigRaw: require('./tsconfig.json'),
         },
       },
       {

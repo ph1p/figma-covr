@@ -1,25 +1,26 @@
 import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
 
+import {
+  SERVER_URL,
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_SCOPES,
+  SPOTIFY_API_URL,
+} from '../utils/constants';
 import { AlbumItem, Albums } from '../utils/interfaces';
 
 class Api {
-  SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
-  SPOTIFY_URL = 'https://api.spotify.com/v1/';
-  clientId = '1932a3a9fc3b4ec49c3594eb61f4b55a';
-  scopes = 'user-read-email user-library-read';
-
-  authorizeUrl(secret) {
+  generateAuthorizeUrl(secret) {
     return (
       'https://accounts.spotify.com/authorize' +
       '?response_type=code' +
       '&client_id=' +
-      this.clientId +
+      SPOTIFY_CLIENT_ID +
       '&state=' +
       secret +
-      (this.scopes ? '&scope=' + encodeURIComponent(this.scopes) : '') +
+      (SPOTIFY_SCOPES ? '&scope=' + encodeURIComponent(SPOTIFY_SCOPES) : '') +
       '&redirect_uri=' +
-      encodeURIComponent(`${this.SERVER_URL}/callback/`)
+      encodeURIComponent(`${SERVER_URL}/callback/`)
     );
   }
 
@@ -58,7 +59,7 @@ class Api {
 
   async getNewAccessToken(refreshToken) {
     try {
-      const response = await axios.get(`${this.SERVER_URL}/refresh_token`, {
+      const response = await axios.get(`${SERVER_URL}/refresh_token`, {
         params: {
           refresh_token: refreshToken,
         },
@@ -72,7 +73,7 @@ class Api {
 
   async getUserTokenFromServer(secret: string) {
     try {
-      const response = await axios.get(`${this.SERVER_URL}/account/${secret}`);
+      const response = await axios.get(`${SERVER_URL}/account/${secret}`);
 
       if (!response.data.waiting) {
         return response.data;
@@ -86,7 +87,7 @@ class Api {
 
   async getAlbums(searchTerm: string): Promise<AlbumItem[]> {
     try {
-      const response = await axios.get<Albums>(`${this.SPOTIFY_URL}search`, {
+      const response = await axios.get<Albums>(`${SPOTIFY_API_URL}search`, {
         params: {
           q: searchTerm,
           type: 'album',
@@ -110,7 +111,7 @@ class Api {
         items: {
           album: AlbumItem;
         }[];
-      }>(`${this.SPOTIFY_URL}me/albums`, {
+      }>(`${SPOTIFY_API_URL}me/albums`, {
         params: {
           limit: 50,
         },

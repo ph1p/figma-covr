@@ -19,6 +19,7 @@ module.exports = {
   plugins: ['import', '@typescript-eslint'],
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 0,
+    '@typescript-eslint/no-var-requires': 0,
     'react/no-did-mount-set-state': 0,
     'react-hooks/exhaustive-deps': 0,
     'import/order': [

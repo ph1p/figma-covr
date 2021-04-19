@@ -2,12 +2,17 @@
   "compilerOptions": {
     "target": "es6",
     "jsx": "react",
+    "declaration": true,
+    "declarationDir": "types",
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
     "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
   }
 }

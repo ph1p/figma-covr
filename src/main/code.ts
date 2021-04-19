@@ -63,7 +63,7 @@ MessageEmitter.on('drop image', (data) => {
   const xFromCanvas = hasUI
     ? dropPosition.clientX - leftPaneWidth
     : dropPosition.clientX;
-  const yFromCanvas = hasUI ? dropPosition.clientY - 40 : dropPosition.clientY;
+  const yFromCanvas = hasUI ? dropPosition.clientY - 48 : dropPosition.clientY;
 
   const rect = figma.createRectangle();
   rect.resize(200, 200);

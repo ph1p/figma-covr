@@ -17,7 +17,7 @@ export const LoginView: FunctionComponent = observer(() => {
 
   const connect = () => {
     const secret = Math.random().toString(36).substr(2, 9);
-    window.open(store.api.authorizeUrl(secret));
+    window.open(store.api.generateAuthorizeUrl(secret));
     setSecret(secret);
     setLoading(true);
   };

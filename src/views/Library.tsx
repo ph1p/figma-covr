@@ -14,8 +14,14 @@ export const LibraryView: FunctionComponent = observer(() => {
     store.api
       .getLibraryAlbums()
       .then((data) => data && store.setLibraryAlbums(data))
-      .catch((e) => {
-        console.log(e);
+      .catch(({ error }) => {
+        if (error) {
+          store.logout();
+          store.setNotification({
+            title: 'Session timeout',
+            subtitle: error.message,
+          });
+        }
       });
   }, []);
 
