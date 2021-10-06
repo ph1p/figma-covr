@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'preact/hooks';
+import React, { FunctionComponent } from 'react';
 import styled from 'styled-components';
 
 import { Layout } from '../components/Layout';

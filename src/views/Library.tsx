@@ -1,20 +1,22 @@
 import { observer } from 'mobx-react';
-import React, { FunctionComponent, useEffect } from 'react';
+import { useEffect } from 'preact/hooks';
+import React, { FunctionComponent } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import { Cover } from '../components/Cover';
 import { Layout } from '../components/Layout';
 import { LoadingScreen } from '../components/Loading';
-import { LoadingIcon } from '../components/icons/LoadingIcon';
 import { useStore } from '../store';
 
 export const LibraryView: FunctionComponent = observer(() => {
   const store = useStore();
 
-  const { isLoading, isError, data = [] } = useQuery('library', () =>
-    store.api.getLibraryAlbums()
-  );
+  const {
+    isLoading,
+    isError,
+    data = [],
+  } = useQuery('library', () => store.api.getLibraryAlbums());
 
   useEffect(() => {
     if (isError) {

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { observer } from 'mobx-react';
-import React, { FunctionComponent, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'preact/hooks';
+import React, { FunctionComponent } from 'react';
 import styled from 'styled-components';
 
 import FigmaMessageEmitter from '../utils/MessageEmitter';
@@ -8,138 +9,137 @@ import { AlbumItem } from '../utils/interfaces';
 
 import { ImageHoverIcon } from './icons/ImageHoverIcon';
 
-export const Cover: FunctionComponent<
-  AlbumItem & { grid?: boolean }
-> = observer((props: AlbumItem & { grid?: boolean }) => {
-  const imageUrl = props.images[0].url;
-  const [isDrag, setIsDrag] = useState<boolean>(false);
-  const ref = useRef(null);
+export const Cover: FunctionComponent<AlbumItem & { grid?: boolean }> =
+  observer((props: AlbumItem & { grid?: boolean }) => {
+    const imageUrl = props.images[0].url;
+    const [isDrag, setIsDrag] = useState<boolean>(false);
+    const ref = useRef<HTMLImageElement>(null);
 
-  const artists = useMemo(
-    () => props.artists.map((artist) => artist.name).join(' & '),
-    [props.artists]
-  );
-
-  const shortName = useMemo(() => {
-    const maxLength = props.grid ? 10 : 20;
-    let name = props.name;
-
-    if (name.length > maxLength) {
-      name = name.substr(0, maxLength);
-      name += '...';
-    }
-    return name;
-  }, [props.name]);
-
-  const [dragData, setDragData] = useState({
-    offsetX: 0,
-    offsetY: 0,
-    dragUrl: '',
-  });
-
-  const onDragStart = (e) => {
-    setIsDrag(true);
-
-    e.nativeEvent.dataTransfer.setDragImage(
-      ref.current,
-      e.nativeEvent.offsetX,
-      e.nativeEvent.offsetY
+    const artists = useMemo(
+      () => props.artists.map((artist) => artist.name).join(' & '),
+      [props.artists]
     );
-    setDragData({
-      dragUrl: e.currentTarget.dataset.url,
-      offsetX: e.nativeEvent.offsetX,
-      offsetY: e.nativeEvent.offsetY,
+
+    const shortName = useMemo(() => {
+      const maxLength = props.grid ? 10 : 20;
+      let name = props.name;
+
+      if (name.length > maxLength) {
+        name = name.substr(0, maxLength);
+        name += '...';
+      }
+      return name;
+    }, [props.name]);
+
+    const [dragData, setDragData] = useState({
+      offsetX: 0,
+      offsetY: 0,
+      dragUrl: '',
     });
-  };
 
-  const onDragEnd = (e) => {
-    e.preventDefault();
-    e.nativeEvent.preventDefault();
-    setIsDrag(false);
-    if (e.view.length === 0) return;
+    const onDragStart = (e) => {
+      setIsDrag(true);
 
-    const dropPosition = {
-      clientX: e.clientX,
-      clientY: e.clientY,
-    };
-
-    const message = {
-      dropPosition,
-      windowSize: {
-        width: window.outerWidth,
-        height: window.outerHeight,
-      },
-      offset: {
-        x: dragData.offsetX,
-        y: dragData.offsetY,
-      },
-    };
-
-    axios
-      .get(dragData.dragUrl, {
-        responseType: 'arraybuffer',
-      })
-      .then((response) => {
-        const data = Buffer.from(response.data, 'binary');
-        FigmaMessageEmitter.emit('drop image', {
-          image: data,
-          ...message,
-        });
-      });
-  };
-
-  const sendImage = (url) => {
-    axios
-      .get(url, {
-        responseType: 'arraybuffer',
-      })
-      .then((response) =>
-        FigmaMessageEmitter.emit(
-          'set image',
-          Buffer.from(response.data, 'binary')
-        )
+      e.nativeEvent.dataTransfer.setDragImage(
+        ref.current,
+        e.nativeEvent.offsetX,
+        e.nativeEvent.offsetY
       );
-  };
+      setDragData({
+        dragUrl: e.currentTarget.dataset.url,
+        offsetX: e.nativeEvent.offsetX,
+        offsetY: e.nativeEvent.offsetY,
+      });
+    };
 
-  const sendText = (text) => FigmaMessageEmitter.emit('set text', text);
+    const onDragEnd = (e) => {
+      e.preventDefault();
+      e.nativeEvent.preventDefault();
+      setIsDrag(false);
+      if (e.view.length === 0) return;
 
-  return (
-    <Wrapper
-      key={props.id}
-      grid={props.grid}
-      data-url={imageUrl}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      draggable="true"
-    >
-      <Image onClick={() => sendImage(imageUrl)}>
-        <Overlay className={isDrag ? 'placeholder' : ''}>
-          <ImageHoverIcon />
-        </Overlay>
+      const dropPosition = {
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
 
-        <img
-          ref={ref}
-          src={imageUrl}
-          draggable="false"
-          style={{ zIndex: isDrag ? -1 : 1 }}
-        />
-      </Image>
+      const message = {
+        dropPosition,
+        windowSize: {
+          width: window.outerWidth,
+          height: window.outerHeight,
+        },
+        offset: {
+          x: dragData.offsetX,
+          y: dragData.offsetY,
+        },
+      };
 
-      <TitleAndArtist>
-        <div>
-          <h4 onClick={() => sendText(props.name)}>{shortName}</h4>
-        </div>
-        <div>
-          <p onClick={() => sendText(artists)}>{artists}</p>
-        </div>
-      </TitleAndArtist>
-    </Wrapper>
-  );
-});
+      axios
+        .get(dragData.dragUrl, {
+          responseType: 'arraybuffer',
+        })
+        .then((response) => {
+          const data = Buffer.from(response.data, 'binary');
+          FigmaMessageEmitter.emit('drop image', {
+            image: data,
+            ...message,
+          });
+        });
+    };
+
+    const sendImage = (url) => {
+      axios
+        .get(url, {
+          responseType: 'arraybuffer',
+        })
+        .then((response) =>
+          FigmaMessageEmitter.emit(
+            'set image',
+            Buffer.from(response.data, 'binary')
+          )
+        );
+    };
+
+    const sendText = (text) => FigmaMessageEmitter.emit('set text', text);
+
+    return (
+      <Wrapper
+        key={props.id}
+        grid={props.grid}
+        data-url={imageUrl}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        draggable="true"
+      >
+        <Image onClick={() => sendImage(imageUrl)}>
+          <Overlay className={isDrag ? 'placeholder' : ''}>
+            <ImageHoverIcon />
+          </Overlay>
+
+          <img
+            ref={ref}
+            src={imageUrl}
+            draggable="false"
+            style={{ zIndex: isDrag ? -1 : 1 }}
+          />
+        </Image>
+
+        <TitleAndArtist>
+          <div>
+            <h4 onClick={() => sendText(props.name)}>{shortName}</h4>
+          </div>
+          <div>
+            <p onClick={() => sendText(artists)}>{artists}</p>
+          </div>
+        </TitleAndArtist>
+      </Wrapper>
+    );
+  });
 
 const Overlay = styled.div`
   border-radius: 5px;
-  pointer-events: none;
+  /* pointer-events: none; */
   opacity: 0;
   position: absolute;
   top: 0;

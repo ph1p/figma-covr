@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
-import React, { FunctionComponent, useEffect } from 'react';
+import { useEffect } from 'preact/hooks';
+import React, { FunctionComponent } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 
@@ -15,9 +16,12 @@ export const DashboardView: FunctionComponent = observer(() => {
 
   const debouncedSearchTerm = useDebounce<string>(store.searchTerm, 500);
 
-  const { isLoading, isError, data = [] } = useQuery(
-    ['users', debouncedSearchTerm],
-    () => (debouncedSearchTerm ? store.api.getAlbums(debouncedSearchTerm) : [])
+  const {
+    isLoading,
+    isError,
+    data = [],
+  } = useQuery(['users', debouncedSearchTerm], () =>
+    debouncedSearchTerm ? store.api.getAlbums(debouncedSearchTerm) : []
   );
 
   useEffect(() => {
@@ -43,9 +47,7 @@ export const DashboardView: FunctionComponent = observer(() => {
             />
           </SearchField>
         </Header>
-        {isLoading && (
-          <LoadingScreen description="Retrieving album covers" />
-        )}
+        {isLoading && <LoadingScreen description="Retrieving album covers" />}
 
         <SearchResults>
           {data.length > 0 &&

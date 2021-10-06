@@ -3,7 +3,7 @@ import { AsyncTrunk, ignore } from 'mobx-sync';
 import React from 'react';
 
 import MessageEmitter from '../utils/MessageEmitter';
-import { AlbumItem, SpotifyUser } from '../utils/interfaces';
+import { SpotifyUser } from '../utils/interfaces';
 
 import Api from './api';
 

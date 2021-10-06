@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
-import React, { FunctionComponent, useMemo } from 'react';
+import { useMemo, useRef } from 'preact/hooks';
+import React, { FunctionComponent } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -13,6 +14,9 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
   const store = useStore();
   const history = useHistory();
   const location = useLocation();
+  const searchRef = useRef<any>(null);
+  const libraryRef = useRef<any>(null);
+  const profileRef = useRef<any>(null);
 
   const profilePictureUrl = useMemo(() => {
     if (store.user?.images?.length > 0) {
@@ -20,16 +24,21 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
     }
     return '';
   }, [store.user]);
+
   return (
     <Wrapper>
       <nav>
         <ul>
           <Tooltip
             hover
+            ref={searchRef}
             handler={React.forwardRef<HTMLLIElement, unknown>((_, ref) => (
               <li
                 ref={ref}
-                onClick={() => history.push('/dashboard')}
+                onClick={() => {
+                  history.push('/dashboard');
+                  searchRef.current.hide();
+                }}
                 className={location.pathname === '/dashboard' ? 'active' : ''}
               >
                 <MagnifierIcon width="25" height="25" />
@@ -40,10 +49,14 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
           </Tooltip>
           <Tooltip
             hover
+            ref={libraryRef}
             handler={React.forwardRef<HTMLLIElement, unknown>((_, ref) => (
               <li
                 ref={ref}
-                onClick={() => history.push('/library')}
+                onClick={() => {
+                  history.push('/library');
+                  libraryRef.current.hide();
+                }}
                 className={location.pathname === '/library' ? 'active' : ''}
               >
                 <LibraryIcon width="25" height="25" />
@@ -54,8 +67,16 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
           </Tooltip>
           <Tooltip
             hover
+            ref={profileRef}
             handler={React.forwardRef<HTMLLIElement, unknown>((_, ref) => (
-              <li ref={ref} className="avatar" onClick={() => store.logout()}>
+              <li
+                ref={ref}
+                className="avatar"
+                onClick={() => {
+                  store.logout();
+                  libraryRef.current.hide();
+                }}
+              >
                 <ProfilePicture url={profilePictureUrl} />
               </li>
             ))}

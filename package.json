@@ -25,8 +25,7 @@
     "mobx": "^6.3.3",
     "mobx-react": "^7.2.0",
     "mobx-sync": "^3.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "preact": "^10.5.14",
     "react-popper": "^2.2.5",
     "react-query": "^3.25.1",
     "react-router-dom": "^5.3.0",
@@ -59,7 +58,10 @@
     "api": "1.0.0",
     "main": "code.js",
     "ui": "ui.html",
-    "editorType": ["figma", "figjam"],
+    "editorType": [
+      "figma",
+      "figjam"
+    ],
     "enableProposedApi": false
   }
 }
