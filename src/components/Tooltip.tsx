@@ -10,6 +10,7 @@ interface Props {
   style?: unknown;
   offsetHorizontal?: number;
   placement?: 'top' | 'bottom';
+  offset?: number;
 }
 
 const TooltipComponent = React.forwardRef<unknown, Props>((props, ref) => {
@@ -23,7 +24,6 @@ const TooltipComponent = React.forwardRef<unknown, Props>((props, ref) => {
   const [arrowElement, setArrowElement] = useState(null);
   const { styles, attributes } = usePopper(handlerRef.current, popperElement, {
     placement: props.placement || 'top',
-    strategy: 'fixed',
     modifiers: [
       {
         name: 'arrow',
@@ -34,13 +34,13 @@ const TooltipComponent = React.forwardRef<unknown, Props>((props, ref) => {
       {
         name: 'offset',
         options: {
-          offset: [0, props.hover ? 10 : 14],
+          offset: [0, props.offset],
         },
       },
       {
         name: 'preventOverflow',
         options: {
-          padding: props.offsetHorizontal || 14,
+          padding: props.offsetHorizontal || 7,
         },
       },
     ],
@@ -108,7 +108,7 @@ const Arrow = styled.div`
     position: absolute;
     width: 21px;
     height: 21px;
-    background-color: #1bc47d;
+    background-color: #000;
     transform: rotate(45deg);
     top: 0px;
     left: 0px;
@@ -119,7 +119,8 @@ const Arrow = styled.div`
 
 const Tooltip = styled.div`
   position: fixed;
-  background-color: #1bc47d;
+  background-color: #000;
+  color: #fff;
   border-radius: ${(p) => (p.hover ? 3 : 20)}px;
   visibility: ${(p) => (p.isOpen ? 'visible' : 'hidden')};
   pointer-events: ${(p) => (p.isOpen ? 'all' : 'none')};

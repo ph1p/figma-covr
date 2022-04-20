@@ -2,7 +2,7 @@ import MessageEmitter from '../utils/MessageEmitter';
 import './store';
 
 figma.showUI(__html__, {
-  width: 300,
+  width: 285,
   height: 530,
 });
 
@@ -83,16 +83,69 @@ MessageEmitter.on('drop image', (data) => {
     });
 });
 
+MessageEmitter.answer('create items frame', async () => {
+  const frame = figma.createFrame();
+
+  frame.name = 'covr images';
+  frame.resize(200, 200);
+
+  figma.viewport.scrollAndZoomIntoView([frame]);
+
+  return frame.id;
+});
+
+MessageEmitter.on('insert item', ({ data, parentId }) => {
+  const parentNode = figma.getNodeById(parentId);
+
+  if (parentNode && parentNode.type === 'FRAME') {
+    const rect = figma.createRectangle();
+    rect.resize(200, 200);
+
+    const imageHash = figma.createImage(data).hash;
+
+    rect.fills = []
+      .filter((fill) => fill.type !== 'IMAGE')
+      .concat({
+        type: 'IMAGE',
+        imageHash,
+        scaleMode: 'FILL',
+      });
+
+    parentNode.layoutMode = 'VERTICAL';
+    parentNode.appendChild(rect);
+  }
+});
+
 MessageEmitter.on('set image', (data) => {
   const selection = figma.currentPage.selection;
 
   if (
-    !selection.some((node) => node.type !== 'GROUP' && node.type !== 'SLICE')
+    !selection.some(
+      (node) =>
+        node.type !== 'GROUP' &&
+        node.type !== 'SLICE' &&
+        node.type !== 'CONNECTOR' &&
+        node.type !== 'CODE_BLOCK' &&
+        node.type !== 'WIDGET' &&
+        node.type !== 'EMBED' &&
+        node.type !== 'LINK_UNFURL' &&
+        node.type !== 'MEDIA'
+    )
   ) {
     figma.notify('Please select a valid target or use drag&drop');
   } else {
     for (const node of figma.currentPage.selection) {
-      if (node && node.type !== 'GROUP' && node.type !== 'SLICE') {
+      if (
+        node &&
+        node.type !== 'GROUP' &&
+        node.type !== 'SLICE' &&
+        node.type !== 'CONNECTOR' &&
+        node.type !== 'CODE_BLOCK' &&
+        node.type !== 'WIDGET' &&
+        node.type !== 'EMBED' &&
+        node.type !== 'LINK_UNFURL' &&
+        node.type !== 'MEDIA'
+      ) {
         const imageHash = figma.createImage(data).hash;
 
         const fills: Paint[] = JSON.parse(JSON.stringify(node.fills || []));

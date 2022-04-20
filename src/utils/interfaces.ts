@@ -1,4 +1,3 @@
-
 export interface Albums {
   albums: {
     href: string;
@@ -12,6 +11,18 @@ export interface Albums {
 }
 
 export type AlbumType = 'album' | 'compilation' | 'single';
+
+export interface ShowItem {
+  id: string;
+  publisher: string;
+  artists: string;
+  images: {
+    height: number;
+    url: string;
+    width: number;
+  }[];
+  name: string;
+}
 
 export interface AlbumItem {
   album_type: AlbumType;
@@ -64,4 +75,37 @@ export interface SpotifyUser {
   refresh_token: string;
   type: string;
   uri: string;
+}
+
+export interface FollowingItem {
+  external_urls: {
+    spotify: string;
+  };
+  followers: {
+    href?: any;
+    total: number;
+  };
+  genres: string[];
+  href: string;
+  id: string;
+  images: {
+    height: number;
+    url: string;
+    width: number;
+  }[];
+  name: string;
+  popularity: number;
+  type: string;
+  uri: string;
+}
+
+export interface Followings {
+  items: FollowingItem[];
+  next: string;
+  total: number;
+  cursors: {
+    after: string;
+  };
+  limit: number;
+  href: string;
 }

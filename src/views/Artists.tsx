@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import { useEffect } from 'preact/hooks';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useInfiniteQuery } from 'react-query';
+import styled from 'styled-components';
 
 import ContentLoader, { Loader } from '../components/ContentLoader';
 import { Cover } from '../components/Cover';
@@ -10,7 +11,7 @@ import { Layout } from '../components/Layout';
 import { useStore } from '../store';
 import { Content, Grid } from '../style';
 
-export const DashboardView: FunctionComponent = observer(() => {
+export const ArtistsView: FunctionComponent = observer(() => {
   const store = useStore();
 
   const {
@@ -21,9 +22,9 @@ export const DashboardView: FunctionComponent = observer(() => {
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useInfiniteQuery('podcast', (ctx) => store.api.getPodcasts(ctx), {
+  } = useInfiniteQuery('artists', (ctx) => store.api.getFollowing(ctx), {
     getNextPageParam: (lastPage) =>
-      lastPage.next ? lastPage.limit + lastPage.offset : null,
+      lastPage.next ? lastPage.cursors.after : null,
   });
 
   const handleScroll = useCallback(
@@ -53,7 +54,7 @@ export const DashboardView: FunctionComponent = observer(() => {
 
   return isLoading ? (
     <Content>
-      <ContentLoader />
+      <ContentLoader rounded />
     </Content>
   ) : (
     <Layout>
@@ -61,28 +62,24 @@ export const DashboardView: FunctionComponent = observer(() => {
         <Grid>
           {data.pages.map((group, i) => (
             <React.Fragment key={i}>
-              {group.items.map((show) => (
-                <Cover key={show.id} {...show} grid />
+              {group.items.map((album) => (
+                <Cover grid round key={album.id} {...album} />
               ))}
             </React.Fragment>
           ))}
           {hasNextPage &&
           (isFetchingNextPage || (isFetching && !isFetchingNextPage))
-            ? [...new Array(15)].map(() => <Loader />)
+            ? [...new Array(15)].map(() => <Loader rounded />)
             : null}
         </Grid>
 
         {!isLoading && !data.pages.length && (
           <EmptyView
             title="Nothing here"
-            description={
-              <>
-                Just subcribe to
-                <br /> some podcasts
-              </>
-            }
+            description="Just follow some artists"
           />
         )}
+
         <div></div>
       </Content>
     </Layout>

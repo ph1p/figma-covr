@@ -1,16 +1,17 @@
 import { observer } from 'mobx-react';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useInfiniteQuery } from 'react-query';
+import styled from 'styled-components';
 
 import ContentLoader, { Loader } from '../components/ContentLoader';
 import { Cover } from '../components/Cover';
 import { EmptyView } from '../components/EmptyView';
 import { Layout } from '../components/Layout';
 import { useStore } from '../store';
-import { Content, Grid } from '../style';
+import { Content } from '../style';
 
-export const DashboardView: FunctionComponent = observer(() => {
+export const TracksView: FunctionComponent = observer(() => {
   const store = useStore();
 
   const {
@@ -21,7 +22,7 @@ export const DashboardView: FunctionComponent = observer(() => {
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useInfiniteQuery('podcast', (ctx) => store.api.getPodcasts(ctx), {
+  } = useInfiniteQuery('music', (ctx) => store.api.getTracks(ctx), {
     getNextPageParam: (lastPage) =>
       lastPage.next ? lastPage.limit + lastPage.offset : null,
   });
@@ -61,8 +62,8 @@ export const DashboardView: FunctionComponent = observer(() => {
         <Grid>
           {data.pages.map((group, i) => (
             <React.Fragment key={i}>
-              {group.items.map((show) => (
-                <Cover key={show.id} {...show} grid />
+              {group.items.map((album) => (
+                <Cover key={album.id} {...album} grid />
               ))}
             </React.Fragment>
           ))}
@@ -77,14 +78,20 @@ export const DashboardView: FunctionComponent = observer(() => {
             title="Nothing here"
             description={
               <>
-                Just subcribe to
-                <br /> some podcasts
+                Add some tracks
+                <br />
+                to your library
               </>
             }
           />
         )}
-        <div></div>
       </Content>
     </Layout>
   );
 });
+
+const Grid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+`;

@@ -3,9 +3,10 @@ import { useEffect, useState } from 'preact/hooks';
 import React, { FunctionComponent } from 'react';
 import styled from 'styled-components';
 
+import BackgroundImage from '../assets/bg.png';
 import { Layout } from '../components/Layout';
-import { FyfillLogo } from '../components/icons/FyfillLogo';
 import { LoadingIcon } from '../components/icons/LoadingIcon';
+import { Logo } from '../components/icons/Logo';
 import { SpotifyLogo } from '../components/icons/SpotifyLogo';
 import { useStore } from '../store';
 import { useInterval } from '../utils/hooks';
@@ -55,7 +56,7 @@ export const LoginView: FunctionComponent = observer(() => {
   }, [count]);
 
   return (
-    <Layout footer={<>This is not an official app from Spotify</>}>
+    <Layout background={BackgroundImage}>
       <Content>
         {loading ? (
           <Loading>
@@ -65,15 +66,24 @@ export const LoginView: FunctionComponent = observer(() => {
           </Loading>
         ) : (
           <Login>
-            <Logo>
-              <FyfillLogo width="40" height="40" />
-
-              <h3>FYFILL</h3>
-            </Logo>
+            <Welcome>
+              Welcome to <strong>covr.</strong>
+              <br />
+              Your daily driver to
+              <br />
+              look for album and
+              <br />
+              podcast art
+            </Welcome>
             <Button onClick={connect}>
               <SpotifyLogo />
-              <span>Login with Spotify</span>
+              <span>Connect with Spotify</span>
             </Button>
+            <Footer>
+              All rights reserved by spotify No official
+              <br />
+              Spotify plugin
+            </Footer>
           </Login>
         )}
       </Content>
@@ -81,19 +91,24 @@ export const LoginView: FunctionComponent = observer(() => {
   );
 });
 
+const Footer = styled.div`
+  color: #000;
+  opacity: 0.2;
+  font-size: 11px;
+  align-self: center;
+`;
+
 const Content = styled.div`
   display: flex;
-  align-self: center;
   width: 100%;
   height: 100%;
 `;
 
 const Loading = styled.div`
   text-align: center;
-  align-self: center;
   width: 100%;
-  color: #fff;
 
+  padding: 320px 0 0 0;
   svg {
     animation: spin 1s linear forwards infinite;
   }
@@ -108,49 +123,38 @@ const Loading = styled.div`
   }
 `;
 
-const Logo = styled.div`
-  text-align: center;
-  align-self: center;
-  color: #fff;
-  margin-top: 20px;
-  img {
-    width: 33px;
-    height: 33px;
-  }
-  h3 {
-    margin-bottom: 0;
-  }
+const Welcome = styled.div`
+  font-size: 23px;
+  text-align: left;
+  letter-spacing: -1px;
 `;
+
 const Login = styled.div`
   display: grid;
-  grid-template-rows: 1fr 43px 33px;
+  padding-top: 300px;
+  grid-template-rows: 133px 39px 62px;
   text-align: center;
   width: 100%;
-  color: #fff;
-  ${Logo} {
-    h3 {
-      letter-spacing: 2px;
-    }
-  }
+  padding: 295px 22px 0;
 `;
 
 const Button = styled.button`
+  width: 100%;
   align-self: center;
-  background-color: #1db954;
+  /* background-color: #1db954; */
+  background-color: #000;
   color: #fff;
   border-radius: 61px;
-  padding: 12px 19px;
+  padding: 10px 12px 9px;
   border: 0;
   margin: 0 auto;
   cursor: pointer;
-  filter: drop-shadow(0px 11px 28px rgba(0, 0, 0, 0.35));
+  box-shadow: 0px 11px 28px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  text-transform: uppercase;
   letter-spacing: 1px;
-  font-weight: bold;
-  font-size: 11px;
+  font-size: 12px;
   span {
-    margin-left: 10px;
+    margin: 0 33px;
   }
 `;

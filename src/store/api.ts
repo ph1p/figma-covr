@@ -7,7 +7,13 @@ import {
   SPOTIFY_SCOPES,
   SPOTIFY_API_URL,
 } from '../utils/constants';
-import { AlbumItem, Albums } from '../utils/interfaces';
+import {
+  AlbumItem,
+  Albums,
+  FollowingItem,
+  Followings,
+  ShowItem,
+} from '../utils/interfaces';
 
 class Api {
   generateAuthorizeUrl(secret) {
@@ -85,35 +91,132 @@ class Api {
     }
   }
 
-  async getAlbums(searchTerm: string): Promise<AlbumItem[]> {
+  async getSearchAlbums({
+    meta: { search = '' },
+    pageParam = 0,
+  }): Promise<any> {
+    if (!search) {
+      return [];
+    }
+
     try {
       const response = await axios.get<Albums>(`${SPOTIFY_API_URL}search`, {
         params: {
-          q: searchTerm,
-          type: 'album',
+          q: search,
+          type: 'album,show',
+          offset: pageParam,
+          limit: 15,
         },
         headers: {
           Authorization: `Bearer ${this.store.user.access_token}`,
         },
       });
 
-      return response.data.albums.items.filter(
-        (album) => album.images.length > 0
-      );
+      return Object.entries(response.data).reduce((prev, [, curr]) => {
+        return [...curr.items, ...prev];
+      }, []);
     } catch (e) {
       return Promise.reject(e?.response?.data || 'Unknown error');
     }
   }
 
-  async getLibraryAlbums(): Promise<AlbumItem[]> {
+  async getPodcasts({ pageParam = 0 }) {
     try {
       const response = await axios.get<{
+        limit: number;
+        offset: number;
+        next: string | null;
+        items: {
+          show: ShowItem;
+        }[];
+      }>(`${SPOTIFY_API_URL}me/shows`, {
+        params: {
+          offset: pageParam,
+          limit: 15,
+        },
+        headers: {
+          Authorization: `Bearer ${this.store.user.access_token}`,
+        },
+      });
+
+      return {
+        ...response.data,
+        items: response.data.items
+          .map((item) => ({
+            ...item.show,
+            artists: item.show.publisher,
+          }))
+          .filter((album) => album.images.length > 0),
+      };
+    } catch (e) {
+      return Promise.reject(e?.response?.data || 'Unknown error');
+    }
+  }
+
+  async getFollowing({ pageParam = 0 }) {
+    try {
+      const response = await axios.get<Followings>(
+        `${SPOTIFY_API_URL}me/following`,
+        {
+          params: {
+            type: 'artist',
+            after: pageParam,
+            limit: 15,
+            market: 'from_token',
+          },
+          headers: {
+            Authorization: `Bearer ${this.store.user.access_token}`,
+          },
+        }
+      );
+
+      return (response.data as any).artists;
+    } catch (e) {
+      return Promise.reject(e?.response?.data || 'Unknown error');
+    }
+  }
+
+  async getLibraryAlbums({ pageParam = 0 }) {
+    try {
+      const response = await axios.get<{
+        limit: number;
+        offset: number;
+        next: string | null;
         items: {
           album: AlbumItem;
         }[];
       }>(`${SPOTIFY_API_URL}me/albums`, {
         params: {
-          limit: 50,
+          offset: pageParam,
+          limit: 15,
+        },
+        headers: {
+          Authorization: `Bearer ${this.store.user.access_token}`,
+        },
+      });
+
+      return {
+        ...response.data,
+        items: response.data.items
+          .map((item) => item.album)
+          .filter((album) => album.images.length > 0),
+      };
+    } catch (e) {
+      console.log(e);
+      return Promise.reject(e?.response?.data || 'Unknown error');
+    }
+  }
+
+  async getAlbums({ pageParam = 0 }): Promise<AlbumItem[]> {
+    try {
+      const response = await axios.get<{
+        items: {
+          album: AlbumItem;
+        }[];
+      }>(`${SPOTIFY_API_URL}albums`, {
+        params: {
+          offset: pageParam,
+          limit: 15,
         },
         headers: {
           Authorization: `Bearer ${this.store.user.access_token}`,
@@ -123,6 +226,38 @@ class Api {
       return response.data.items
         .map((item) => item.album)
         .filter((album) => album.images.length > 0);
+    } catch (e) {
+      return Promise.reject(e?.response?.data || 'Unknown error');
+    }
+  }
+
+  async getTracks({ pageParam = 0 }) {
+    try {
+      const response = await axios.get<{
+        limit: number;
+        offset: number;
+        next: string | null;
+        items: {
+          track: {
+            album: AlbumItem;
+          };
+        }[];
+      }>(`${SPOTIFY_API_URL}me/tracks`, {
+        params: {
+          offset: pageParam,
+          limit: 15,
+        },
+        headers: {
+          Authorization: `Bearer ${this.store.user.access_token}`,
+        },
+      });
+
+      return {
+        ...response.data,
+        items: response.data.items
+          .map((item) => item.track.album)
+          .filter((album) => album.images.length > 0),
+      };
     } catch (e) {
       return Promise.reject(e?.response?.data || 'Unknown error');
     }

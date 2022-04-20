@@ -7,7 +7,7 @@ import { SpotifyUser } from '../utils/interfaces';
 
 import Api from './api';
 
-const STORAGE_KEY = '__figma_mobx_sync__';
+const STORAGE_KEY = '__figma_covr__';
 
 interface Notification {
   title: string;
@@ -28,6 +28,12 @@ class RootStore {
   searchTerm = '';
 
   @ignore
+  metaPressed = false;
+
+  @ignore
+  insertItems = [];
+
+  @ignore
   get api() {
     return new Api(this, (access_token) => {
       this.setUser({
@@ -41,8 +47,23 @@ class RootStore {
     return !!this.user;
   }
 
+  addRemoveInsertItem(item: string) {
+    if (this.insertItems.includes(item)) {
+      this.insertItems = this.insertItems.filter((i) => i !== item);
+    } else {
+      this.insertItems.push(item);
+    }
+  }
+
   setSearchTerm(searchTerm: string) {
     this.searchTerm = searchTerm;
+  }
+
+  setMetaPressed(metaPressed: boolean) {
+    if (!metaPressed) {
+      this.insertItems = [];
+    }
+    this.metaPressed = metaPressed;
   }
 
   setNotification(notification: Notification) {

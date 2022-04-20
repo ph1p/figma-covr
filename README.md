@@ -1,4 +1,4 @@
-# Fyfill
+# covr.
 
 ![header](https://user-images.githubusercontent.com/15351728/113784036-fa65c800-9734-11eb-989e-d5171ddbf239.png)
 
@@ -7,4 +7,4 @@ You can also set artist names and album titles in text nodes.
 
 ## Server
 
-You can find the server here: https://github.com/ph1p/fyfill-server
+You can find the server here: https://github.com/ph1p/covr-server

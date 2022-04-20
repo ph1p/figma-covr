@@ -4,19 +4,34 @@ import { useMemo, useRef, useState } from 'preact/hooks';
 import React, { FunctionComponent } from 'react';
 import styled from 'styled-components';
 
+import { useStore } from '../store';
 import FigmaMessageEmitter from '../utils/MessageEmitter';
-import { AlbumItem } from '../utils/interfaces';
+import { AlbumItem, FollowingItem, ShowItem } from '../utils/interfaces';
 
 import { ImageHoverIcon } from './icons/ImageHoverIcon';
 
-export const Cover: FunctionComponent<AlbumItem & { grid?: boolean }> =
-  observer((props: AlbumItem & { grid?: boolean }) => {
+export const Cover: FunctionComponent<
+  (AlbumItem | ShowItem | FollowingItem) & {
+    grid?: boolean;
+    round?: boolean;
+  }
+> = observer(
+  (
+    props: (AlbumItem | ShowItem) & {
+      grid?: boolean;
+      round?: boolean;
+    }
+  ) => {
     const imageUrl = props.images[0].url;
     const [isDrag, setIsDrag] = useState<boolean>(false);
     const ref = useRef<HTMLImageElement>(null);
+    const store = useStore();
 
     const artists = useMemo(
-      () => props.artists.map((artist) => artist.name).join(' & '),
+      () =>
+        Array.isArray(props.artists)
+          ? props.artists.map((artist) => artist.name).join(' & ')
+          : props.artists,
       [props.artists]
     );
 
@@ -25,7 +40,7 @@ export const Cover: FunctionComponent<AlbumItem & { grid?: boolean }> =
       let name = props.name;
 
       if (name.length > maxLength) {
-        name = name.substr(0, maxLength);
+        name = name.substring(0, maxLength);
         name += '...';
       }
       return name;
@@ -102,43 +117,66 @@ export const Cover: FunctionComponent<AlbumItem & { grid?: boolean }> =
     };
 
     const sendText = (text) => FigmaMessageEmitter.emit('set text', text);
+    const dimTile = store.metaPressed && !store.insertItems.includes(imageUrl);
 
     return (
       <Wrapper
         key={props.id}
         grid={props.grid}
         data-url={imageUrl}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        draggable="true"
+        onClick={() => store.metaPressed && store.addRemoveInsertItem(imageUrl)}
+        onDragStart={store.metaPressed ? null : onDragStart}
+        onDragEnd={store.metaPressed ? null : onDragEnd}
+        draggable={store.metaPressed ? 'false' : 'true'}
       >
-        <Image onClick={() => sendImage(imageUrl)}>
-          <Overlay className={isDrag ? 'placeholder' : ''}>
-            <ImageHoverIcon />
-          </Overlay>
+        <Image
+          onClick={() => !store.metaPressed && sendImage(imageUrl)}
+          url={imageUrl}
+          round={props.round}
+          style={{
+            opacity: dimTile ? 0.4 : 1,
+          }}
+        >
+          {!store.metaPressed && (
+            <Overlay
+              round={props.round}
+              className={isDrag ? 'placeholder' : ''}
+            >
+              <ImageHoverIcon />
+            </Overlay>
+          )}
 
           <img
             ref={ref}
             src={imageUrl}
             draggable="false"
-            style={{ zIndex: isDrag ? -1 : 1 }}
+            style={{
+              zIndex: isDrag ? -1 : 1,
+            }}
           />
         </Image>
 
-        <TitleAndArtist>
+        <TitleAndArtist
+          style={{
+            opacity: dimTile ? 0.4 : 1,
+          }}
+        >
           <div>
-            <h4 onClick={() => sendText(props.name)}>{shortName}</h4>
+            <h4 onClick={() => !dimTile && sendText(props.name)}>
+              {shortName}
+            </h4>
           </div>
           <div>
-            <p onClick={() => sendText(artists)}>{artists}</p>
+            <p onClick={() => !dimTile && sendText(artists)}>{artists}</p>
           </div>
         </TitleAndArtist>
       </Wrapper>
     );
-  });
+  }
+);
 
-const Overlay = styled.div`
-  border-radius: 5px;
+const Overlay = styled.div<{ round: boolean }>`
+  border-radius: ${(props) => (props.round ? '100%' : '5px')};
   /* pointer-events: none; */
   opacity: 0;
   position: absolute;
@@ -159,11 +197,11 @@ const Overlay = styled.div`
     margin: 0 auto;
   }
   &.placeholder {
-    opacity: 1;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    background: transparent;
+    opacity: 0.8;
+    background: #e5e5e5;
     circle {
       opacity: 0.2;
+      fill: #000;
     }
   }
 `;
@@ -181,7 +219,7 @@ const TitleAndArtist = styled.div`
         left: -8px;
         bottom: -3px;
         top: -3px;
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: rgba(0, 0, 0, 0.15);
         border-radius: 10px;
       }
     }
@@ -194,12 +232,12 @@ const TitleAndArtist = styled.div`
   p {
     margin: 0;
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(0, 0, 0, 0.7);
     cursor: pointer;
   }
 `;
 
-const Image = styled.div`
+const Image = styled.div<{ round: boolean; url: string }>`
   position: relative;
   width: 100%;
   margin: 0 auto;
@@ -214,12 +252,28 @@ const Image = styled.div`
   img {
     position: relative;
     width: 100%;
-    border-radius: 5px;
+    border-radius: ${(props) => (props.round ? '100%' : '5px')};
+    aspect-ratio: 1/1;
+    object-fit: cover;
+  }
+
+  &::after {
+    content: '';
+    top: 25px;
+    left: 12px;
+    width: 80%;
+    height: 80%;
+    position: absolute;
+    /* opacity: 0.7; */
+    filter: blur(14.7347px);
+    border-radius: 5.59184px;
+    background-image: url(${(props) => props.url});
+    background-size: cover;
   }
 `;
 
 const Wrapper = styled.div<{ grid: boolean }>`
-  color: #fff;
+  color: #000;
   width: ${(props) => (props.grid ? 'calc(50% - 7.5px)' : 'auto')};
   display: ${(props) => (props.grid ? 'block' : 'flex')};
   margin: ${(props) => (props.grid ? '0' : '0 0 10px 0')};
