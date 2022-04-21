@@ -375,12 +375,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.1":
-  version: 18.0.1
-  resolution: "@types/react-dom@npm:18.0.1"
+"@types/react-dom@npm:^18.0.2":
+  version: 18.0.2
+  resolution: "@types/react-dom@npm:18.0.2"
   dependencies:
     "@types/react": "*"
-  checksum: 6c183e2e50240b77ed767cd968fe061ef4f2b47f84da5ec9e412a767d68c9a004d1f6ccca4295a5aa2c3ee723377e59006a2031f3767c00d8ac9e240a51bb142
+  checksum: 2b0b138d8634ccfd8a86b17cb5414b122ee0cb6f650377d772f6008761a27e4c2531c08e3cab71aaa19b6893af6a508c664aa314db3ebcff5b8179173c9c9307
   languageName: node
   linkType: hard
 
@@ -416,14 +416,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18.0.5":
-  version: 18.0.5
-  resolution: "@types/react@npm:18.0.5"
+"@types/react@npm:^18.0.6":
+  version: 18.0.6
+  resolution: "@types/react@npm:18.0.6"
   dependencies:
     "@types/prop-types": "*"
     "@types/scheduler": "*"
     csstype: ^3.0.2
-  checksum: 70d3336d43ef25509fa89ef3278f57fdf1945fc921e69b7890a78ab9a52a55ee38e2f13aa71eb4f6032b7311e7557860ce8836c1acf3028304989571c9736a96
+  checksum: 368b40176f0dab30a611c3263bf1d9878cebede9ce8015bc5661a396787dbe41f0b667b8d6d448dea7bc8c0557bf3cb329ab2b16ad2dacb18eaa764358bd16d4
   languageName: node
   linkType: hard
 
@@ -1193,8 +1193,8 @@ __metadata:
   dependencies:
     "@figma/plugin-typings": ^1.44.0
     "@popperjs/core": ^2.11.5
-    "@types/react": ^18.0.5
-    "@types/react-dom": ^18.0.1
+    "@types/react": ^18.0.6
+    "@types/react-dom": ^18.0.2
     "@types/react-router-dom": ^5.3.3
     "@typescript-eslint/eslint-plugin": ^5.20.0
     "@typescript-eslint/parser": ^5.20.0
@@ -1215,7 +1215,7 @@ __metadata:
     preact: ^10.7.1
     react-content-loader: ^6.2.0
     react-popper: ^2.2.5
-    react-query: ^3.35.0
+    react-query: ^3.37.0
     react-router-dom: ^6.3.0
     style-loader: ^3.3.1
     styled-components: ^5.3.5
@@ -3670,9 +3670,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-query@npm:^3.35.0":
-  version: 3.35.0
-  resolution: "react-query@npm:3.35.0"
+"react-query@npm:^3.37.0":
+  version: 3.37.0
+  resolution: "react-query@npm:3.37.0"
   dependencies:
     "@babel/runtime": ^7.5.5
     broadcast-channel: ^3.4.1
@@ -3684,7 +3684,7 @@ __metadata:
       optional: true
     react-native:
       optional: true
-  checksum: 07f5986a85c78274f25d5f725eb11b7abe9248d771b5c72397cd9fbc183acafbb5d1db5d426e833aeb28aeb42934035370e7b1cdc52c185733ea3035dced40a5
+  checksum: 0dc78540518a4f902a97c7f73596903e58ffd7396c358f79b887c3531ca571b6f57443a1fa28854d1056b593c6db57038e9a151d5ea47c201a1f319378bd10e6
   languageName: node
   linkType: hard
 
