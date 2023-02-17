@@ -60,7 +60,7 @@ export const TracksView: FunctionComponent = observer(() => {
     <Layout>
       <Content onScroll={handleScroll}>
         <Grid>
-          {data.pages.map((group, i) => (
+          {data?.pages?.map((group, i) => (
             <React.Fragment key={i}>
               {group.items.map((album) => (
                 <Cover key={album.id} {...album} grid />
@@ -73,7 +73,7 @@ export const TracksView: FunctionComponent = observer(() => {
             : null}
         </Grid>
 
-        {!isLoading && !data.pages.length && (
+        {!isLoading && !data?.pages?.length && (
           <EmptyView
             title="Nothing here"
             description={
