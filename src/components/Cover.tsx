@@ -67,7 +67,7 @@ export const Cover: FunctionComponent<
       });
     };
 
-    const onDragEnd = (e) => {
+    const onDragEnd = async (e) => {
       e.preventDefault();
       e.nativeEvent.preventDefault();
       setIsDrag(false);
@@ -90,17 +90,46 @@ export const Cover: FunctionComponent<
         },
       };
 
-      axios
-        .get(dragData.dragUrl, {
-          responseType: 'arraybuffer',
-        })
-        .then((response) => {
-          const data = Buffer.from(response.data, 'binary');
-          FigmaMessageEmitter.emit('drop image', {
-            image: data,
-            ...message,
+      if (dragData.dragUrl && store.insertItems.length === 0) {
+        axios
+          .get(dragData.dragUrl, {
+            responseType: 'arraybuffer',
+          })
+          .then((response) => {
+            const data = Buffer.from(response.data, 'binary');
+            FigmaMessageEmitter.emit('drop image', {
+              image: data,
+              ...message,
+            });
           });
+      } else {
+        const frameId = await FigmaMessageEmitter.ask('create items frame', {
+          isDragAndDrop: true,
+          data: {
+            ...message,
+          },
         });
+
+        if (!frameId) {
+          return;
+        }
+
+        for (const item of store.insertItems) {
+          try {
+            const response = await axios.get(item, {
+              responseType: 'arraybuffer',
+            });
+
+            const data = Buffer.from(response.data, 'binary');
+            FigmaMessageEmitter.emit('insert item', {
+              data,
+              parentId: frameId,
+            });
+          } catch {
+            //
+          }
+        }
+      }
     };
 
     const sendImage = (url) => {
@@ -117,34 +146,31 @@ export const Cover: FunctionComponent<
     };
 
     const sendText = (text) => FigmaMessageEmitter.emit('set text', text);
-    const dimTile = store.metaPressed && !store.insertItems.includes(imageUrl);
+    const dimTile = store.shiftPressed && !store.insertItems.includes(imageUrl);
 
     return (
       <Wrapper
         key={props.id}
         grid={props.grid}
         data-url={imageUrl}
-        onClick={() => store.metaPressed && store.addRemoveInsertItem(imageUrl)}
-        onDragStart={store.metaPressed ? null : onDragStart}
-        onDragEnd={store.metaPressed ? null : onDragEnd}
-        draggable={store.metaPressed ? 'false' : 'true'}
+        onClick={() =>
+          store.shiftPressed && store.addRemoveInsertItem(imageUrl)
+        }
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        draggable={true}
       >
         <Image
-          onClick={() => !store.metaPressed && sendImage(imageUrl)}
+          onClick={() => !store.shiftPressed && sendImage(imageUrl)}
           url={imageUrl}
           round={props.round}
           style={{
             opacity: dimTile ? 0.4 : 1,
           }}
         >
-          {!store.metaPressed && (
-            <Overlay
-              round={props.round}
-              className={isDrag ? 'placeholder' : ''}
-            >
-              <ImageHoverIcon />
-            </Overlay>
-          )}
+          <Overlay round={props.round} className={isDrag ? 'placeholder' : ''}>
+            <ImageHoverIcon />
+          </Overlay>
 
           <img
             ref={ref}
@@ -225,7 +251,7 @@ const TitleAndArtist = styled.div`
     }
   }
   h4 {
-    font-size: 16px;
+    font-size: 1.35em;
     margin: 0 0 4px;
     cursor: pointer;
   }

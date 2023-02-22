@@ -1,22 +1,25 @@
 import { observer } from 'mobx-react';
-import React, { FunctionComponent, useCallback, useMemo, useRef } from 'react';
-import { useInfiniteQuery, useQuery } from 'react-query';
+import React, { useMemo, useRef } from 'react';
+import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useStore } from '../store';
-import { Content, Grid } from '../style';
+import { Content } from '../style';
 import { useDebounce } from '../utils/hooks';
 
 import { ListLoader } from './ContentLoader';
 import { Cover } from './Cover';
 import { EmptyView } from './EmptyView';
 import Tooltip from './Tooltip';
+import { BackIcon } from './icons/BackIcon';
 import { CloseIcon } from './icons/CloseIcon';
 import { MagnifierIcon } from './icons/MagnifierIcon';
 
 export const Header = observer(() => {
   const store = useStore();
-  const profileRef = useRef<any>(null);
+  const navigate = useNavigate();
+  const profileRef = useRef<HTMLDivElement & { hide: () => void }>(null);
 
   const profilePictureUrl = useMemo(() => {
     if (store.user?.images?.length > 0) {
@@ -52,20 +55,39 @@ export const Header = observer(() => {
   return (
     <>
       <HeaderStyle>
-        <SearchField>
-          <MagnifierIcon width="18" height="18" />
-          {debouncedSearchTerm && (
-            <div className="clear" onClick={() => store.setSearchTerm('')}>
-              <CloseIcon width="12" height="12" />
-            </div>
-          )}
-          <input
-            type="text"
-            placeholder="Search"
-            value={store.searchTerm}
-            onChange={(e) => store.setSearchTerm(e.currentTarget.value)}
-          />
-        </SearchField>
+        {store.header ? (
+          <Title
+            onClick={() => {
+              store.setShiftPressed(false);
+              store.header.backLink && navigate(store.header.backLink);
+            }}
+          >
+            <BackIcon width="18" height="18" />
+            <span>{store.header.title}</span>
+          </Title>
+        ) : (
+          <SearchField>
+            {!store.shiftPressed && (
+              <>
+                <MagnifierIcon width="18" height="18" />
+                {debouncedSearchTerm && (
+                  <div
+                    className="clear"
+                    onClick={() => store.setSearchTerm('')}
+                  >
+                    <CloseIcon width="12" height="12" />
+                  </div>
+                )}
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={store.searchTerm}
+                  onChange={(e) => store.setSearchTerm(e.currentTarget.value)}
+                />
+              </>
+            )}
+          </SearchField>
+        )}
         <Tooltip
           hover
           offset={0}
@@ -136,6 +158,20 @@ const HeaderStyle = styled.header`
     margin: 0;
     font-size: 11px;
     color: rgba(255, 255, 255, 0.4);
+  }
+`;
+
+const Title = styled.div`
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  cursor: pointer;
+  svg {
+    margin: 0 10px 0 0;
   }
 `;
 

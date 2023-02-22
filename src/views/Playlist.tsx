@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import { useEffect } from 'preact/hooks';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useInfiniteQuery } from 'react-query';
+import { useParams } from 'react-router-dom';
 
 import ContentLoader, { Loader } from '../components/ContentLoader';
 import { Cover } from '../components/Cover';
@@ -10,8 +11,9 @@ import { Layout } from '../components/Layout';
 import { useStore } from '../store';
 import { Content, Grid } from '../style';
 
-export const ArtistsView: FunctionComponent = observer(() => {
+export const PlaylistView: FunctionComponent = observer(() => {
   const store = useStore();
+  const { id } = useParams();
 
   const {
     data,
@@ -21,10 +23,14 @@ export const ArtistsView: FunctionComponent = observer(() => {
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useInfiniteQuery('artists', (ctx) => store.api.getFollowing(ctx), {
-    getNextPageParam: (lastPage) =>
-      lastPage.next ? lastPage.cursors.after : null,
-  });
+  } = useInfiniteQuery(
+    ['playlist', id],
+    (ctx) => store.api.getPlaylistTracks(ctx),
+    {
+      getNextPageParam: (lastPage) =>
+        lastPage.next ? lastPage.limit + lastPage.offset : null,
+    }
+  );
 
   const handleScroll = useCallback(
     (e) => {
@@ -51,9 +57,13 @@ export const ArtistsView: FunctionComponent = observer(() => {
     }
   }, [isError]);
 
+  useEffect(() => {
+    return () => store.setHeader(null);
+  }, []);
+
   return isLoading ? (
     <Content>
-      <ContentLoader rounded />
+      <ContentLoader />
     </Content>
   ) : (
     <Layout>
@@ -62,24 +72,22 @@ export const ArtistsView: FunctionComponent = observer(() => {
           {data?.pages?.map((group, i) => (
             <React.Fragment key={i}>
               {group.items.map((album) => (
-                <Cover grid round key={album.id} {...album} />
+                <Cover grid key={album.id} {...album} />
               ))}
             </React.Fragment>
           ))}
           {hasNextPage &&
           (isFetchingNextPage || (isFetching && !isFetchingNextPage))
-            ? [...new Array(15)].map(() => <Loader rounded />)
+            ? [...new Array(15)].map(() => <Loader />)
             : null}
         </Grid>
 
         {!isLoading && !data?.pages?.length && (
           <EmptyView
             title="Nothing here"
-            description="Just follow some artists"
+            description="The playlist seems to be empty"
           />
         )}
-
-        <div></div>
       </Content>
     </Layout>
   );

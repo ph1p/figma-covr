@@ -14,9 +14,13 @@ interface Notification {
   subtitle: string;
 }
 
+interface Header {
+  title: string;
+  backLink: string;
+}
 class RootStore {
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   user: SpotifyUser = null;
@@ -28,10 +32,16 @@ class RootStore {
   searchTerm = '';
 
   @ignore
-  metaPressed = false;
+  shiftPressed = false;
 
   @ignore
   insertItems = [];
+
+  @ignore
+  header?: Header = null;
+
+  @ignore
+  shiftEnabled = true;
 
   @ignore
   get api() {
@@ -59,11 +69,11 @@ class RootStore {
     this.searchTerm = searchTerm;
   }
 
-  setMetaPressed(metaPressed: boolean) {
-    if (!metaPressed) {
+  setShiftPressed(shiftPressed: boolean) {
+    if (!shiftPressed) {
       this.insertItems = [];
     }
-    this.metaPressed = metaPressed;
+    this.shiftPressed = shiftPressed;
   }
 
   setNotification(notification: Notification) {
@@ -72,6 +82,14 @@ class RootStore {
 
   setUser(data) {
     this.user = data;
+  }
+
+  setHeader(header?: Header) {
+    this.header = header;
+  }
+
+  setShiftEnabled(shiftEnabled: boolean) {
+    this.shiftEnabled = shiftEnabled;
   }
 
   logout() {

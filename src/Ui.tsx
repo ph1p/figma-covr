@@ -21,6 +21,8 @@ import { AlbumsView } from './views/Albums';
 import { ArtistsView } from './views/Artists';
 import { DashboardView } from './views/Dashboard';
 import { LoginView } from './views/Login';
+import { PlaylistView } from './views/Playlist';
+import { PlaylistsView } from './views/Playlists';
 import { TracksView } from './views/Tracks';
 
 import './style.css';
@@ -60,24 +62,24 @@ const App = observer(() => {
   const store = useStore();
 
   useEffect(() => {
-    const metaDown = (e) => {
-      if (e.key === 'Meta') {
-        store.setMetaPressed(true);
+    const shiftDown = (e) => {
+      if (e.key === 'Shift' && store.shiftEnabled) {
+        store.setShiftPressed(true);
       }
     };
 
-    const metaUp = (e) => {
-      if (e.key === 'Meta') {
-        store.setMetaPressed(false);
+    const shiftUp = (e) => {
+      if (e.key === 'Shift' && store.insertItems.length === 0 && store.shiftEnabled) {
+        store.setShiftPressed(false);
       }
     };
 
-    window.addEventListener('keydown', metaDown);
-    window.addEventListener('keyup', metaUp);
+    window.addEventListener('keydown', shiftDown);
+    window.addEventListener('keyup', shiftUp);
 
     return () => {
-      window.removeEventListener('keydown', metaDown);
-      window.removeEventListener('keyup', metaUp);
+      window.removeEventListener('keydown', shiftDown);
+      window.removeEventListener('keyup', shiftUp);
     };
   }, []);
 
@@ -95,6 +97,10 @@ const App = observer(() => {
             <Route path="/albums" element={<AlbumsView />} />
             <Route path="/tracks" element={<TracksView />} />
             <Route path="/artists" element={<ArtistsView />} />
+            <Route path="/playlists">
+              <Route element={<PlaylistsView />} index />
+              <Route path=":id" element={<PlaylistView />} />
+            </Route>
           </Route>
         </Routes>
         {store.isAuthenticated && <FloatingNavigation />}
