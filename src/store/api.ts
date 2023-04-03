@@ -10,8 +10,9 @@ import {
 import {
   AlbumItem,
   Albums,
-  FollowingItem,
   Followings,
+  Playlist,
+  Playlists,
   ShowItem,
 } from '../utils/interfaces';
 
@@ -207,7 +208,7 @@ class Api {
     }
   }
 
-  async getAlbums({ pageParam = 0 }): Promise<AlbumItem[]> {
+  async getAlbums({ pageParam = 0 }) {
     try {
       const response = await axios.get<{
         items: {
@@ -259,6 +260,79 @@ class Api {
           .filter((album) => album.images.length > 0),
       };
     } catch (e) {
+      return Promise.reject(e?.response?.data || 'Unknown error');
+    }
+  }
+
+  async getPlaylists({ pageParam = 0 }) {
+    try {
+      const response = await axios.get<Playlists>(
+        `${SPOTIFY_API_URL}me/playlists`,
+        {
+          params: {
+            limit: 15,
+            offset: pageParam,
+          },
+          headers: {
+            Authorization: `Bearer ${this.store.user.access_token}`,
+          },
+        }
+      );
+
+      return {
+        ...response.data,
+        items: response.data.items.filter(
+          (playlist) => playlist.images.length > 0
+        ),
+      };
+    } catch (e) {
+      return Promise.reject(e?.response?.data || 'Unknown error');
+    }
+  }
+
+  async getPlaylistTracks({ pageParam = 0, queryKey }): Promise<{
+    limit: number;
+    offset: number;
+    next: string | null;
+    items: AlbumItem[];
+  }> {
+    const [, id] = queryKey;
+
+    try {
+      const response = await axios.get<{
+        limit: number;
+        offset: number;
+        next: string | null;
+        items: {
+          track: {
+            album: AlbumItem;
+          };
+        }[];
+      }>(`${SPOTIFY_API_URL}playlists/${id}/tracks`, {
+        params: {
+          limit: 15,
+          offset: pageParam,
+        },
+        headers: {
+          Authorization: `Bearer ${this.store.user.access_token}`,
+        },
+      });
+
+      let items = response.data.items
+        .map((item) => item.track.album)
+        .filter((playlist) => playlist.images.length > 0);
+
+      items = items.filter(
+        (value, index, self) =>
+          index === self.findIndex((t) => t.id === value.id)
+      );
+
+      return {
+        ...response.data,
+        items,
+      };
+    } catch (e) {
+      console.log(e);
       return Promise.reject(e?.response?.data || 'Unknown error');
     }
   }

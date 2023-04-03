@@ -51,8 +51,8 @@ figma.on('selectionchange', async () => {
   MessageEmitter.emit('selection', getNodes(figma.currentPage.selection));
 });
 
-MessageEmitter.on('drop image', (data) => {
-  const { dropPosition, windowSize, offset, image } = data;
+const getPositionFromData = (data) => {
+  const { dropPosition, windowSize, offset } = data;
 
   // Thanks to @jackiecorn https://github.com/jackiecorn/figma-plugin-drag-and-drop
   const bounds = figma.viewport.bounds;
@@ -65,14 +65,22 @@ MessageEmitter.on('drop image', (data) => {
     : dropPosition.clientX;
   const yFromCanvas = hasUI ? dropPosition.clientY - 48 : dropPosition.clientY;
 
+  return {
+    x: bounds.x + xFromCanvas / zoom - offset.x,
+    y: bounds.y + yFromCanvas / zoom - offset.y,
+  };
+};
+
+MessageEmitter.on('drop image', (data) => {
+  const { x, y } = getPositionFromData(data);
+  const imageHash = figma.createImage(data.image).hash;
+
   const rect = figma.createRectangle();
   rect.resize(200, 200);
   figma.currentPage.appendChild(rect);
 
-  rect.x = bounds.x + xFromCanvas / zoom - offset.x;
-  rect.y = bounds.y + yFromCanvas / zoom - offset.y;
-
-  const imageHash = figma.createImage(image).hash;
+  rect.x = x;
+  rect.y = y;
 
   rect.fills = []
     .filter((fill) => fill.type !== 'IMAGE')
@@ -83,81 +91,96 @@ MessageEmitter.on('drop image', (data) => {
     });
 });
 
-MessageEmitter.answer('create items frame', async () => {
-  const frame = figma.createFrame();
+MessageEmitter.answer('create items frame', async ({ data, isDragAndDrop }) => {
+  if (isDragAndDrop || !figma.currentPage.selection.length) {
+    const frame = figma.createFrame();
 
-  frame.name = 'covr images';
-  frame.resize(200, 200);
+    frame.name = 'covr images';
+    frame.resize(200, 200);
 
-  figma.viewport.scrollAndZoomIntoView([frame]);
+    if (data && Object.keys(data).length > 0) {
+      const { x, y } = getPositionFromData(data);
+      frame.x = x;
+      frame.y = y;
+    } else {
+      figma.viewport.scrollAndZoomIntoView([frame]);
+    }
 
-  return frame.id;
+    return frame.id;
+  }
+
+  return null;
 });
 
-MessageEmitter.on('insert item', ({ data, parentId }) => {
+MessageEmitter.answer(
+  'selection count',
+  () => figma.currentPage.selection.length
+);
+
+MessageEmitter.on('insert item', ({ data, parentId, selectionIndex }) => {
   const parentNode = figma.getNodeById(parentId);
 
-  if (parentNode && parentNode.type === 'FRAME') {
-    const rect = figma.createRectangle();
-    rect.resize(200, 200);
+  if (selectionIndex !== null && !parentNode) {
+    replaceNodeFill(figma.currentPage.selection[selectionIndex], data);
+  } else {
+    if (parentNode && parentNode.type === 'FRAME') {
+      const rect = figma.createRectangle();
+      rect.resize(200, 200);
+
+      const imageHash = figma.createImage(data).hash;
+
+      rect.fills = []
+        .filter((fill) => fill.type !== 'IMAGE')
+        .concat({
+          type: 'IMAGE',
+          imageHash,
+          scaleMode: 'FILL',
+        });
+
+      parentNode.layoutMode = 'VERTICAL';
+      parentNode.appendChild(rect);
+    }
+  }
+});
+
+const NOT_VALID_FILL_NODES = [
+  'GROUP',
+  'SLICE',
+  'CONNECTOR',
+  'CODE_BLOCK',
+  'WIDGET',
+  'EMBED',
+  'LINK_UNFURL',
+  'MEDIA',
+];
+
+const replaceNodeFill = (node, data) => {
+  if (
+    !figma.currentPage.selection.some((node) =>
+      NOT_VALID_FILL_NODES.includes(node.type)
+    )
+  ) {
+    const fills: Paint[] = JSON.parse(JSON.stringify(node.fills || []));
 
     const imageHash = figma.createImage(data).hash;
-
-    rect.fills = []
+    node.fills = fills
       .filter((fill) => fill.type !== 'IMAGE')
       .concat({
         type: 'IMAGE',
         imageHash,
         scaleMode: 'FILL',
       });
-
-    parentNode.layoutMode = 'VERTICAL';
-    parentNode.appendChild(rect);
   }
-});
+};
 
 MessageEmitter.on('set image', (data) => {
   const selection = figma.currentPage.selection;
 
-  if (
-    !selection.some(
-      (node) =>
-        node.type !== 'GROUP' &&
-        node.type !== 'SLICE' &&
-        node.type !== 'CONNECTOR' &&
-        node.type !== 'CODE_BLOCK' &&
-        node.type !== 'WIDGET' &&
-        node.type !== 'EMBED' &&
-        node.type !== 'LINK_UNFURL' &&
-        node.type !== 'MEDIA'
-    )
-  ) {
+  if (selection.some((node) => NOT_VALID_FILL_NODES.includes(node.type))) {
     figma.notify('Please select a valid target or use drag&drop');
   } else {
     for (const node of figma.currentPage.selection) {
-      if (
-        node &&
-        node.type !== 'GROUP' &&
-        node.type !== 'SLICE' &&
-        node.type !== 'CONNECTOR' &&
-        node.type !== 'CODE_BLOCK' &&
-        node.type !== 'WIDGET' &&
-        node.type !== 'EMBED' &&
-        node.type !== 'LINK_UNFURL' &&
-        node.type !== 'MEDIA'
-      ) {
-        const imageHash = figma.createImage(data).hash;
-
-        const fills: Paint[] = JSON.parse(JSON.stringify(node.fills || []));
-
-        node.fills = fills
-          .filter((fill) => fill.type !== 'IMAGE')
-          .concat({
-            type: 'IMAGE',
-            imageHash,
-            scaleMode: 'FILL',
-          });
-      }
+      replaceNodeFill(node, data);
     }
   }
 });

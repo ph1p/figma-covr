@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import BackgroundImage from '../assets/bg.png';
 import { Layout } from '../components/Layout';
 import { LoadingIcon } from '../components/icons/LoadingIcon';
-import { Logo } from '../components/icons/Logo';
 import { SpotifyLogo } from '../components/icons/SpotifyLogo';
 import { useStore } from '../store';
 import { useInterval } from '../utils/hooks';

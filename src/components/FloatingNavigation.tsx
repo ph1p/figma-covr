@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { useRef } from 'preact/hooks';
 import React, { FunctionComponent } from 'react';
@@ -13,40 +12,84 @@ import Tooltip from './Tooltip';
 import { ArtistIcon } from './icons/ArtistIcon';
 import { LibraryIcon } from './icons/LibraryIcon';
 import { MusicIcon } from './icons/MusicIcon';
+import { PlaylistsIcon } from './icons/PlaylistsIcon';
 import { PodcastIcon } from './icons/PodcastIcon';
 
 export const FloatingNavigation: FunctionComponent = observer(() => {
   const store = useStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const searchRef = useRef<any>(null);
-  const libraryRef = useRef<any>(null);
+  const searchRef = useRef<HTMLDivElement & { hide: () => void }>(null);
+  const libraryRef = useRef<HTMLDivElement & { hide: () => void }>(null);
 
   return (
     <>
-      <InsertButton
-        hide={!store.metaPressed}
-        onClick={async () => {
-          const frameId = await FigmaMessageEmitter.ask('create items frame');
+      <InsertContainer hide={!store.shiftPressed}>
+        <InsertButton
+          onClick={async () => {
+            if(!store.insertItems.length) {
+              return;
+            }
 
-          for (const item of store.insertItems) {
-            axios
-              .get(item, {
-                responseType: 'arraybuffer',
-              })
-              .then((response) => {
+            let selectionCount = (await FigmaMessageEmitter.ask(
+              'selection count'
+            )) as number;
+
+            const frameId = await FigmaMessageEmitter.ask(
+              'create items frame',
+              {
+                isDragAndDrop: false,
+              }
+            );
+
+            let currentCount = 0;
+
+            if (!selectionCount) {
+              selectionCount = store.insertItems.length;
+            }
+
+            for (const count of [...new Array(selectionCount)].map(
+              (_, i) => i
+            )) {
+              try {
+                const response = await axios.get(
+                  store.insertItems[currentCount],
+                  {
+                    responseType: 'arraybuffer',
+                  }
+                );
+
                 const data = Buffer.from(response.data, 'binary');
                 FigmaMessageEmitter.emit('insert item', {
                   data,
                   parentId: frameId,
+                  selectionIndex: selectionCount === 0 ? null : count,
                 });
-              });
-          }
-        }}
-      >
-        insert ({store.insertItems.length})
-      </InsertButton>
-      <Wrapper hide={store.metaPressed}>
+
+                if (store.insertItems[currentCount + 1]) {
+                  currentCount++;
+                } else {
+                  currentCount = 0;
+                }
+              } catch {
+                //
+              }
+            }
+            if(!store.insertItems.length) {
+              store.setShiftPressed(false);
+            }
+          }}
+        >
+          insert ({store.insertItems.length})
+        </InsertButton>
+        {store.insertItems.length > 0 && (
+          <InsertButton onClick={() => store.setShiftPressed(false)}>
+            close
+          </InsertButton>
+        )}
+      </InsertContainer>
+
+      <Wrapper hide={store.shiftPressed}>
         <nav>
           <ul>
             <Tooltip
@@ -114,6 +157,25 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
                 <li
                   ref={ref}
                   onClick={() => {
+                    navigate('/playlists');
+                    searchRef.current.hide();
+                  }}
+                  className={location.pathname === '/playlists' ? 'active' : ''}
+                >
+                  <PlaylistsIcon width="25" height="25" />
+                </li>
+              ))}
+            >
+              Playlists
+            </Tooltip>
+            <Tooltip
+              hover
+              offset={19}
+              ref={searchRef}
+              handler={React.forwardRef<HTMLLIElement, unknown>((_, ref) => (
+                <li
+                  ref={ref}
+                  onClick={() => {
                     navigate('/artists');
                     searchRef.current.hide();
                   }}
@@ -136,17 +198,23 @@ export const FloatingNavigation: FunctionComponent = observer(() => {
   );
 });
 
-export const InsertButton = styled.div`
-  position: absolute;
-  left: 50%;
-  bottom: 15px;
+export const InsertContainer = styled.div`
   transition: transform 0.3s;
-  transform: translateX(-50%) translateY(${(p) => (p.hide ? 100 : 0)}px);
-  padding: 10px 36px;
+  transform: translateY(${(p) => (p.hide ? 100 : 0)}px);
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 15px;
+  z-index: 30;
+`;
+export const InsertButton = styled.div`
+  padding: 10px 26px;
   border-radius: 20px;
   background-color: #121212;
   box-shadow: 0px 7px 14px rgb(0 0 0 / 57%);
-  z-index: 30;
   color: #fff;
   font-size: 12px;
   cursor: pointer;
@@ -167,6 +235,7 @@ const Wrapper = styled.div<{ hide: boolean }>`
     box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.57);
     width: 271px;
     svg {
+      opacity: 0.2;
       path {
         fill: #fff;
       }
@@ -194,7 +263,7 @@ const Wrapper = styled.div<{ hide: boolean }>`
         }
         &.active,
         &:hover {
-          svg g {
+          svg {
             opacity: 1;
           }
         }

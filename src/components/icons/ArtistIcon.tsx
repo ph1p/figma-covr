@@ -2,33 +2,24 @@ import React from 'react';
 
 export const ArtistIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
-    width="25"
-    height="25"
-    viewBox="0 -7 25 25"
+    width="23"
+    height="23"
+    viewBox="0 0 23 23"
     fill="none"
-    xmlns="https://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
-    <g opacity="0.3">
-      <rect
-        x="-0.6"
-        y="0.6"
-        width="6.8"
-        height="6.8"
-        rx="3.4"
-        transform="matrix(-1 0 0 1 14.8 0)"
-        stroke="white"
-        strokeWidth="1.2"
-      />
-      <circle
-        cx="0"
-        cy="0"
-        r="30%"
-        transform="matrix(-1 0 0 1 12 18)"
-        fill="transparent"
-        strokeWidth="1.2"
-        stroke="white"
-      />
-    </g>
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M8.5 7.25C8.5 8.89305 9.84315 10.225 11.5 10.225C13.1569 10.225 14.5 8.89305 14.5 7.25C14.5 5.60695 13.1569 4.275 11.5 4.275C9.84315 4.275 8.5 5.60695 8.5 7.25ZM11.5 3C9.13307 3 7.21429 4.90279 7.21429 7.25C7.21429 9.59721 9.13307 11.5 11.5 11.5C13.8669 11.5 15.7857 9.59721 15.7857 7.25C15.7857 4.90279 13.8669 3 11.5 3Z"
+      fill="white"
+    />
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M11.5 13.8375C9.85187 13.8375 8.27124 14.4868 7.10584 15.6425C5.94043 16.7981 5.28571 18.3656 5.28571 20H4C4 18.0275 4.79018 16.1357 6.1967 14.7409C7.60322 13.3461 9.51088 12.5625 11.5 12.5625C13.4891 12.5625 15.3968 13.3461 16.8033 14.7409C18.2098 16.1357 19 18.0275 19 20H17.7143C17.7143 18.3656 17.0596 16.7981 15.8942 15.6425C14.7288 14.4868 13.1481 13.8375 11.5 13.8375Z"
+      fill="white"
+    />
   </svg>
 );

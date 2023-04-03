@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect } from 'preact/hooks';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import styled from 'styled-components';
