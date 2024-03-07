@@ -19,41 +19,41 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@popperjs/core": "^2.11.7",
-    "axios": "^1.3.4",
+    "@popperjs/core": "^2.11.8",
+    "axios": "^1.6.7",
     "buffer": "^6.0.3",
-    "mobx": "^6.9.0",
-    "mobx-react": "^7.6.0",
+    "mobx": "^6.12.0",
+    "mobx-react": "^9.1.0",
     "mobx-sync": "^3.0.0",
-    "preact": "^10.13.2",
+    "preact": "^10.19.6",
     "react-content-loader": "^6.2.1",
     "react-popper": "^2.3.0",
     "react-query": "^3.39.3",
-    "react-router-dom": "^6.10.0",
-    "styled-components": "^5.3.9"
+    "react-router-dom": "^6.22.2",
+    "styled-components": "^6.1.8"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.62.0",
-    "@types/react": "^18.0.32",
-    "@types/react-dom": "^18.0.11",
+    "@figma/plugin-typings": "^1.88.0",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
     "@types/react-router-dom": "^5.3.3",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "create-file-webpack": "^1.0.2",
-    "css-loader": "^6.7.3",
-    "esbuild-loader": "^3.0.1",
-    "eslint": "^8.37.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-react": "^7.32.2",
+    "css-loader": "^6.10.0",
+    "esbuild-loader": "^4.0.3",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.34.0",
     "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.0",
-    "style-loader": "^3.3.2",
-    "terser-webpack-plugin": "^5.3.7",
-    "typescript": "^5.0.3",
+    "html-webpack-plugin": "^5.6.0",
+    "style-loader": "^3.3.4",
+    "terser-webpack-plugin": "^5.3.10",
+    "typescript": "^5.3.3",
     "url-loader": "^4.1.1",
-    "webpack": "^5.77.0",
-    "webpack-cli": "^5.0.1"
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
   },
   "figmaPlugin": {
     "name": "covr",
@@ -65,6 +65,18 @@
       "figma",
       "figjam"
     ],
-    "enableProposedApi": false
+    "enableProposedApi": false,
+    "documentAccess": "dynamic-page",
+    "networkAccess": {
+      "allowedDomains": [
+        "https://covr.ph1p.dev",
+        "https://api.spotify.com",
+        "https://*.scdn.co",
+        "https://*.spotifycdn.com",
+        "https://rsms.me"
+      ],
+      "reasoning": "Connect to Spotify & Load Fonts",
+      "devAllowedDomains": []
+    }
   }
 }

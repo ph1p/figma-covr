@@ -83,7 +83,7 @@ export const DashboardView: FunctionComponent = observer(() => {
             }
           />
         )}
-        <div></div>
+        <div />
       </Content>
     </Layout>
   );

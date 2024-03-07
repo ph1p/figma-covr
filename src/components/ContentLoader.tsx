@@ -5,7 +5,7 @@ import styled from 'styled-components';
 export const Loader = (props: { rounded?: boolean }) => (
   <ContentLoader
     speed={2}
-    width={120}
+    width={113}
     height={160}
     viewBox="0 0 120 160"
     backgroundColor="#f3f3f3"

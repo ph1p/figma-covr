@@ -117,8 +117,8 @@ MessageEmitter.answer(
   () => figma.currentPage.selection.length
 );
 
-MessageEmitter.on('insert item', ({ data, parentId, selectionIndex }) => {
-  const parentNode = figma.getNodeById(parentId);
+MessageEmitter.on('insert item', async ({ data, parentId, selectionIndex }) => {
+  const parentNode = await figma.getNodeByIdAsync(parentId);
 
   if (selectionIndex !== null && !parentNode) {
     replaceNodeFill(figma.currentPage.selection[selectionIndex], data);
